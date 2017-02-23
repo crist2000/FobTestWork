@@ -4,7 +4,7 @@ import some.domain.utils.TraceOps.LogLevel;;
 
 public class TraceOps{
 	
-	public static void printMessage (String loglevel, String message, Object... args) throws Exception{
+	public static void printMessage (String loglevel, String message, Object... args) {
 		
 		switch (loglevel){
 		case LogLevel.WARN: System.out.println(ASNICode.ANSI_BLUE + String.format(message, args)+ASNICode.ANSI_RESET); break;
@@ -12,7 +12,11 @@ public class TraceOps{
 		case LogLevel.ERROR: System.out.println(ASNICode.ANSI_RED + String.format(message, args)+ASNICode.ANSI_RESET); break;
 		case LogLevel.TRACE: System.out.println(ASNICode.ANSI_GREY + String.format(message, args)+ASNICode.ANSI_RESET); break;
 		case LogLevel.PASSED: System.out.println(ASNICode.ANSI_GREEN + String.format(message, args)+ASNICode.ANSI_RESET); break;
-		default: throw new Exception("Unregonized log level is provided.");
+		default: try {
+				throw new Exception("Unregonized log level is provided.");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
