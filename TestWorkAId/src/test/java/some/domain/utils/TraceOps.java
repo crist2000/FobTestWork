@@ -12,6 +12,7 @@ public class TraceOps{
 		case LogLevel.ERROR: System.out.println(ASNICode.ANSI_RED + String.format(message, args)+ASNICode.ANSI_RESET); break;
 		case LogLevel.TRACE: System.out.println(ASNICode.ANSI_GREY + String.format(message, args)+ASNICode.ANSI_RESET); break;
 		case LogLevel.PASSED: System.out.println(ASNICode.ANSI_GREEN + String.format(message, args)+ASNICode.ANSI_RESET); break;
+		case LogLevel.DEBUG: System.out.println(ASNICode.ANSI_PURPLE + String.format(message, args)+ASNICode.ANSI_RESET); break;
 		default: try {
 				throw new Exception("Unregonized log level is provided.");
 			} catch (Exception e) {
@@ -26,6 +27,7 @@ public class TraceOps{
 		public static final String ERROR = "Error";
 		public static final String TRACE = "Trace";
 		public static final String PASSED = "Passed";
+		public static final String DEBUG = "Debug";
 	}
 	private static class ASNICode {	 
 		final static String ANSI_RESET = "\u001B[0m";
@@ -34,5 +36,6 @@ public class TraceOps{
 		final static String ANSI_RED = "\u001B[31;1m";
 		final static String ANSI_GREEN = "\u001B[32;1m";
 		final static String ANSI_BLUE = "\u001B[34;1m";
+		final static String ANSI_PURPLE = "\u001B[35m";
 	}
 }

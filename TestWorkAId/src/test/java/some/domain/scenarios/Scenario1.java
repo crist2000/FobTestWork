@@ -22,6 +22,7 @@ public class Scenario1 extends BaseOperations{
 	
 	public Scenario1() throws IOException {
 		super();
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
 	
 	@Test(priority =0) 

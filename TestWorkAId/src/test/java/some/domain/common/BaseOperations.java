@@ -2,6 +2,7 @@ package some.domain.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
@@ -16,6 +17,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
+import org.testng.Assert;
 
 import com.google.common.base.Function;
 
@@ -65,29 +67,29 @@ public class BaseOperations{
 		
 
 		try {
-			TraceOps.printMessage(LogLevel.TRACE, "Verfying selected element...", "");
+			TraceOps.printMessage(LogLevel.TRACE, "  Verfying selected element...", "");
 			List<WebElement> elems = driver.findElements(by);
 			if (elems.size()!=0){
-				TraceOps.printMessage(LogLevel.PASSED, "Verfying %s locator is present: PASS", by);
+				TraceOps.printMessage(LogLevel.PASSED, "  Verfying %s locator is present: PASS", by);
 				return true;
 			}
 			else{
-				TraceOps.printMessage(LogLevel.ERROR, "Verfying %s locator is present: FAIL", by);
+				TraceOps.printMessage(LogLevel.ERROR, "  Verfying %s locator is present: FAIL", by);
 				return false;
 			}
 		} 
 		catch (Exception e) {
-			TraceOps.printMessage(LogLevel.ERROR, "Unexpected access locator %s was provided.", by);
+			TraceOps.printMessage(LogLevel.ERROR, "  Unexpected access locator %s was provided.", by);
 			return false;
 		}
 	}
 
-	protected void waitForElement(final By by, int timeout, int polling, boolean ignoreEx){
+	public void waitForElement(final By by, int timeout, int polling, boolean ignoreEx){
 		
-		WebElement element;
 		Wait<WebDriver> wait;
+		boolean isFound = false;
 		
-		TraceOps.printMessage(LogLevel.TRACE, "Waiting for element %s", by);
+		TraceOps.printMessage(LogLevel.TRACE, "  Waiting for element %s", by);
 		if (!ignoreEx){
 				wait = new FluentWait<WebDriver>(driver)
 				.withTimeout(timeout, TimeUnit.SECONDS)
@@ -98,23 +100,52 @@ public class BaseOperations{
 				.withTimeout(timeout, TimeUnit.SECONDS)
 				.pollingEvery(polling, TimeUnit.SECONDS);}
 	
-		  try {
-			  element = wait.until(new Function<WebDriver, WebElement>() {
+		Function<WebDriver, Boolean> function = new Function<WebDriver, Boolean>() {
+			public Boolean apply(WebDriver driver) {
 
-		      @Override
-		      public WebElement apply(WebDriver driver)
-		      {
-		    	  return driver.findElement(by);
-		      }
-		    });
-			  TraceOps.printMessage(LogLevel.TRACE, "Element %s was found.", by);
-		  }catch (Exception e){
-			  TraceOps.printMessage(LogLevel.WARN, "Element %s was not found.", by);;
-		  }
-		
+				WebElement element = driver.findElement(by);
+				return element.isDisplayed();
+			}
+		};
+		isFound = wait.until(function);
+		if (isFound)
+			TraceOps.printMessage(LogLevel.TRACE, "  Finished waiting. IsDisplayed: %s. ELEMENT: %s: ", isFound, by);
+		else
+			TraceOps.printMessage(LogLevel.ERROR, "  Finished waiting. IsDisplayed: %s. ELEMENT: %s: ", isFound, by);
 	}
 
-	protected void tryToClick(By by, int tryCount, long polling){
+	public static void waitForElement(WebDriver driver, final By by, int timeout, int polling, boolean ignoreEx){
+		
+		Wait<WebDriver> wait;
+		boolean isFound = false;
+		
+		TraceOps.printMessage(LogLevel.TRACE, "  Waiting for element %s", by);
+		if (!ignoreEx){
+				wait = new FluentWait<WebDriver>(driver)
+				.withTimeout(timeout, TimeUnit.SECONDS)
+				.pollingEvery(polling, TimeUnit.SECONDS)
+				.ignoring(NoSuchElementException.class);}
+		else {
+				wait = new FluentWait<WebDriver>(driver)
+				.withTimeout(timeout, TimeUnit.SECONDS)
+				.pollingEvery(polling, TimeUnit.SECONDS);}
+	
+		Function<WebDriver, Boolean> function = new Function<WebDriver, Boolean>() {
+			public Boolean apply(WebDriver driver) {
+
+				WebElement element = driver.findElement(by);
+				return element.isDisplayed();
+			}
+		};
+		isFound = wait.until(function);
+		if (isFound)
+			TraceOps.printMessage(LogLevel.TRACE, "  Finished waiting. IsDisplayed: %s. ELEMENT: %s: ", isFound, by);
+		else
+			TraceOps.printMessage(LogLevel.ERROR, "  Finished waiting. IsDisplayed: %s. ELEMENT: %s: ", isFound, by);
+		
+	}
+	
+	protected void click(By by, int tryCount, long polling){
 
 		int count = 0;
 		
@@ -130,17 +161,56 @@ public class BaseOperations{
 			} catch (Exception e) {
 				TraceOps.printMessage(LogLevel.WARN,"Failed to click specified element.");
 			}
-			
-			try {
-			Thread.sleep(polling);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}	
+			if(polling!=0 ){
+				try {
+				Thread.sleep(polling);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}	
+			}
 			count++;	
 		}
 	}
 	
-	
+	protected void failOperation (String message){
+		
+		TraceOps.printMessage(LogLevel.ERROR, message);
+		
+		Assert.assertTrue(false);
+		driver.close();
+	}
+
+	protected int getWebElementListSize(By by){
+		
+		List <WebElement> elems = driver.findElements(by);
+		int size = elems.size();
+		TraceOps.printMessage(LogLevel.INFO, "  List Size is %d",size );
+		
+		return size;
+	}
+
+	protected WebElement getElementFromListByText(By by, String criteria){
+		
+		List <WebElement> elems = driver.findElements(by);
+		WebElement elem = null;
+		
+		if (elems.size()==0){
+			TraceOps.printMessage(LogLevel.WARN, "  No elements were found for the %s locator.", by);
+			return elem;
+		}
+		
+		for(WebElement e:elems){
+			if (e.getText().contains(criteria)){
+				TraceOps.printMessage(LogLevel.INFO, "  Matching element '%s' was found",criteria);
+				return e;
+			}
+		}
+		
+		TraceOps.printMessage(LogLevel.WARN, "  Matching element was not found.");
+		return elem;
+		
+	}
+
 	protected void onFinish(){
 
 		try {
