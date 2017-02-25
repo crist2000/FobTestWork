@@ -13,21 +13,12 @@ import some.domain.scenarios.Scenario2;
 import some.domain.utils.TraceOps;
 import some.domain.utils.TraceOps.LogLevel;
 
-/**
- * Utility class containing fields and methods that are common for test scenarios related to 
- * WeGo page tests.
- */
 public class WegoOps {
 	
 	public static final String MENU_SIGNIN = "Sign in";
 	public static final String MENU_COLLECTIONS = "Collections";
 	private static final By cssMenuItems = By.cssSelector("div[class='menu_item']"); 
 	
-	/**
-	 * Opens specific item from Wego main menu.
-	 * @param menuItem - item to be opened.
-	 * @param bo - base class object.
-	 */
 	public static void selectMenuItem(String menuItem, BaseOperations bo){
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Selecting 'Collections' from menu...");
@@ -41,11 +32,6 @@ public class WegoOps {
 		}
 	}
 
-	/**
-	 * Opens WeGo main menu.
-	 * @param wait - object to wait for specific element presence.
-	 * @param bo - base class object.
-	 */
 	public static void openMenu(WebDriverWait wait, BaseOperations bo){
 		
 		By xpathMenuBtn = By.cssSelector("button[class='menu_access_btn icon_btn']");

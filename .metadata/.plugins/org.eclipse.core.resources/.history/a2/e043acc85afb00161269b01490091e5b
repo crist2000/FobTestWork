@@ -5,17 +5,18 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.xml.serializer.utils.SerializerMessages_zh_TW;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import some.domain.common.BaseOperations;
 import some.domain.utils.Helper;
@@ -88,6 +89,8 @@ public class Scenario1 extends BaseOperations{
 	@Test (dependsOnMethods = {"setFrom"},dataProvider = "Directions", enabled = true)
 	public void setTo (String location, String detailedName){
 		
+		System.out.println(detailedName);
+		
 		WebElement element;
 		By idTo = By.id("itinerary_item_input_1");
 		By cssSelectSuggestion = By.cssSelector("#itinerary_item_1 > div.dropdown_list.flying_style > div.dropdown_list_item.suggestion.hovered");
@@ -96,11 +99,9 @@ public class Scenario1 extends BaseOperations{
 		element = driver.findElement(idTo);
 		element.clear();
 		element.sendKeys(location);
-
-		//wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
-		wait.until(ExpectedConditions.presenceOfElementLocated(cssSelectSuggestion));
-
 		
+		wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
+
 		try {
 			WebElement elem = getElementFromListByText(cssSelectSuggestion, detailedName);
 			elem.click();
@@ -109,7 +110,6 @@ public class Scenario1 extends BaseOperations{
 		}
 	}
 
-	//This test is to verify that correct amount of travel time options is calculated based on route.
 	@Test (dependsOnMethods = {"setTo"},dataProvider = "TravelTimeOptions",enabled = true)
 	public void verifyTravelTimeVisible(String from, String to, String byCar, String byBus,String byBike){
 		
@@ -145,7 +145,7 @@ public class Scenario1 extends BaseOperations{
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
 	
-	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
+	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "TravelTimeByBus",enabled = true)
 	public void verifyTravelTimebyBus_calculated(String from, String to, String travelTime){
 
 		String[] travelTimeArray = travelTime.split(",");
@@ -164,7 +164,7 @@ public class Scenario1 extends BaseOperations{
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
 	
-	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
+	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "TravelTimeByBike",enabled = true)
 	public void verifyTravelTimebyBike_calculated(String from, String to, String travelTime ){
 
 		String[] travelTimeArray = travelTime.split(",");
@@ -182,7 +182,7 @@ public class Scenario1 extends BaseOperations{
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
 	
-	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
+	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "TravelTimeOnFoot",enabled = true)
 	public void verifyTravelTimeonFoot_calculated(String from, String to, String travelTime ){
 		
 		By xpathBtn = By.xpath("/html/body/div[1]/div[6]/div/div/div[2]/div/button[5]");
@@ -203,7 +203,6 @@ public class Scenario1 extends BaseOperations{
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
 	
-	
 	@DataProvider(name="Directions")
     public Object[][] getDirectionData(Method e){
 		
@@ -223,7 +222,6 @@ public class Scenario1 extends BaseOperations{
 		}
 	}
 	
-	//Script can calculate different travel times for the same route.
 	@DataProvider(name="getTravelTime")
     public Object[][] getTravelTime(Method e){
 		
@@ -262,10 +260,4 @@ public class Scenario1 extends BaseOperations{
 	}
 	
 	
-	@AfterClass
-	public void onFinish(){
-		
-		TraceOps.printMessage(LogLevel.TRACE, "Starting AfterClass method...");
-		//super.onFinish();
-	}
 }

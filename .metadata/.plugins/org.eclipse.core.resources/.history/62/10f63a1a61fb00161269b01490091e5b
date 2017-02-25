@@ -7,16 +7,8 @@ import org.openqa.selenium.WebElement;
 
 import some.domain.utils.TraceOps.LogLevel;
 
-/**
- * Utility class containing fields and methods that are common for all scenarios.
- */
 public class Helper {
 	
-	/**
-	 * Calculates number of non empty args provided as methods params.
-	 * @param args - args to be assessed.
-	 * @return - int value of non empty args.
-	 */
 	public static int calculateNonEmptyArgs(String... args){
 
 		int count=0;
@@ -28,11 +20,6 @@ public class Helper {
 		return count;
 	}
 
-	/**
-	 * Returns random int from range 1 and list.size()
-	 * @param list - list to be processed.
-	 * @return - random int.
-	 */
 	public static int getRandomIndex(List list){
 		
 		int elemCount = list.size();	
@@ -43,12 +30,6 @@ public class Helper {
 		return randomElem;
 	}
 
-	/**
-	 * Defines if there is element which matches provided criteria. Search performed on linked text.
-	 * @param elems - list to be assessed.
-	 * @param criterias - pattern to be seeking for.
-	 * @return TRUE if match is found in the list.
-	 */
 	public static boolean isMatchingElement(List<WebElement> elems, String[] criterias){
 		
 		boolean isMatch = false;

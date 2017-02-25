@@ -68,13 +68,7 @@ public class BaseOperations{
             driver.close();
          }
  	}
-	
- 	/**
- 	 * Method to identify presence of specific element.
- 	 * @param by - locator.
- 	 * @return - TRUE if element was found. 
- 	 */
- 	protected boolean assertElementIsPresent(By by) {
+	protected boolean assertElementIsPresent(By by) {
 		
 
 		try {
@@ -95,13 +89,6 @@ public class BaseOperations{
 		}
 	}
 
-	/**
-	 * Method to wait for specific element based on FluentWait class object.  
-	 * @param by - locator
-	 * @param timeout - time to wait for the element
-	 * @param polling - polling interval
-	 * @param ignoreEx - FALSE if exception is required after timeout.
-	 */
 	public void waitForElement(final By by, int timeout, int polling, boolean ignoreEx){
 		
 		Wait<WebDriver> wait;
@@ -132,10 +119,6 @@ public class BaseOperations{
 			TraceOps.printMessage(LogLevel.ERROR, "  Finished waiting. IsDisplayed: %s. ELEMENT: %s: ", isFound, by);
 	}
 	
-	/**
-	 * Reserved for future use.
-	 * @param message
-	 */
 	protected void click(By by, int tryCount, long polling){
 
 		int count = 0;
@@ -163,10 +146,6 @@ public class BaseOperations{
 		}
 	}
 	
-	/**
-	 * Reserved for future use.
-	 * @param message
-	 */
 	protected void failOperation (String message){
 		
 		TraceOps.printMessage(LogLevel.ERROR, message);
@@ -175,11 +154,6 @@ public class BaseOperations{
 		driver.close();
 	}
 
-	/**
-	 * Utility method to calculate size of the WebElement list.
-	 * @param by - locator
-	 * @return - list size is returned. 0 if no element was found.
-	 */
 	protected int getWebElementListSize(By by){
 		
 		List <WebElement> elems = driver.findElements(by);
@@ -189,12 +163,6 @@ public class BaseOperations{
 		return size;
 	}
 
-	/**
-	 * Method to get element from the list that matches specific criteria.
-	 * @param by - locator
-	 * @param criteria - pattern to be searched for.
-	 * @return - matching web element. NULL is no match was found. 
-	 */
 	protected WebElement getElementFromListByText(By by, String criteria){
 		
 		List <WebElement> elems = driver.findElements(by);
@@ -217,9 +185,6 @@ public class BaseOperations{
 		
 	}
 
-	/**
-	 * Base method to be used in child class's @AfterClass methods
-	 */
 	protected void onFinish(){
 
 		try {

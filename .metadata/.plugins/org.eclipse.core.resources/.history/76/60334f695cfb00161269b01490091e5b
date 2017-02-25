@@ -96,11 +96,9 @@ public class Scenario1 extends BaseOperations{
 		element = driver.findElement(idTo);
 		element.clear();
 		element.sendKeys(location);
-
-		//wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
-		wait.until(ExpectedConditions.presenceOfElementLocated(cssSelectSuggestion));
-
 		
+		wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
+
 		try {
 			WebElement elem = getElementFromListByText(cssSelectSuggestion, detailedName);
 			elem.click();

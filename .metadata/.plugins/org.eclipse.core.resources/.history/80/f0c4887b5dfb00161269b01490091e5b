@@ -97,7 +97,7 @@ public class Scenario1 extends BaseOperations{
 		element.clear();
 		element.sendKeys(location);
 
-		//wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
+		wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
 		wait.until(ExpectedConditions.presenceOfElementLocated(cssSelectSuggestion));
 
 		

@@ -7,15 +7,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import some.domain.common.BaseOperations;
 import some.domain.utils.Helper;
@@ -25,12 +23,10 @@ import some.domain.utils.TraceOps.LogLevel;
 public class Scenario1 extends BaseOperations{
 
 	String testName;
-	WebDriverWait wait;
 	
 	public Scenario1() throws IOException {
 		super();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(driver, 10);
 	}
 
     @BeforeMethod
@@ -39,6 +35,7 @@ public class Scenario1 extends BaseOperations{
         testName = method.getName(); 
         TraceOps.printMessage(LogLevel.INFO, "Executing test: %s...", testName);
     }
+    
     @AfterMethod
     public void AfterMethod()
     {
@@ -63,54 +60,50 @@ public class Scenario1 extends BaseOperations{
 	}
 	
 	@Test (dependsOnMethods = {"navigateToDirections"},dataProvider="Directions", enabled = true)
-	public void setFrom(String location, String detailedName){
-		
+	public void setFrom(String from, String to, final String xpathFrom, 
+						String xpathTo){
+
 		WebElement element;
 		By idFrom = By.id("itinerary_item_input_0");
-		By cssSelectSuggestion = By.cssSelector("#itinerary_item_0 > div.dropdown_list.flying_style > div.dropdown_list_item.suggestion.hovered");
+		By cssSelectSuggestion = By.cssSelector("div[class='dropdown_list_item suggestion']");
 		
-		TraceOps.printMessage(LogLevel.TRACE, "Entering %s as starting location...", location);
+		
+		
+		TraceOps.printMessage(LogLevel.TRACE, "Entering %s as starting location...", from);
 		element= driver.findElement(idFrom);
 		element.clear();
-		element.sendKeys(location);
+		element.sendKeys(from);
 		
-		wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
+		//waitForElement(By.xpath(xpathFrom), 10, 1, true);
+		waitForElement(cssSelectSuggestion, 10, 1, false);
 		
-		try {
-			WebElement elem = getElementFromListByText(cssSelectSuggestion, detailedName);
-			elem.click();
-		} catch (Exception e) {
-			TraceOps.printMessage(LogLevel.ERROR, "Provided pattern %s was not found in dropdown.", location);
-		}
+		List <WebElement> elems = driver.findElements(cssSelectSuggestion);
+		
+		getWebElementListSize(cssSelectSuggestion);
+		
+		
+		assertElementIsPresent(cssSelectSuggestion);
+		
+		//driver.findElement(By.xpath(xpathFrom)).click();
 
 	}
 	
-	@Test (dependsOnMethods = {"setFrom"},dataProvider = "Directions", enabled = true)
-	public void setTo (String location, String detailedName){
+	@Test (dependsOnMethods = {"setFrom"},dataProvider = "Directions", enabled = false)
+	public void setTo (String from, String to, final String xpathFrom, String xpathTo){
 		
 		WebElement element;
 		By idTo = By.id("itinerary_item_input_1");
-		By cssSelectSuggestion = By.cssSelector("#itinerary_item_1 > div.dropdown_list.flying_style > div.dropdown_list_item.suggestion.hovered");
 		
-		TraceOps.printMessage(LogLevel.TRACE, "Entering %s as destination...", location);
+		TraceOps.printMessage(LogLevel.TRACE, "Entering %s as destination...", to);
 		element = driver.findElement(idTo);
 		element.clear();
-		element.sendKeys(location);
-
-		//wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
-		wait.until(ExpectedConditions.presenceOfElementLocated(cssSelectSuggestion));
-
+		element.sendKeys(to);
+		waitForElement(By.xpath(xpathTo), 10, 1, false);
+		driver.findElement(By.xpath(xpathTo)).click();
 		
-		try {
-			WebElement elem = getElementFromListByText(cssSelectSuggestion, detailedName);
-			elem.click();
-		} catch (Exception e) {
-			TraceOps.printMessage(LogLevel.ERROR, "Provided pattern %s was not found in dropdown.", detailedName);
-		}
 	}
 
-	//This test is to verify that correct amount of travel time options is calculated based on route.
-	@Test (dependsOnMethods = {"setTo"},dataProvider = "TravelTimeOptions",enabled = true)
+	@Test (dependsOnMethods = {"setTo"},dataProvider = "TravelTimeOptions",enabled = false)
 	public void verifyTravelTimeVisible(String from, String to, String byCar, String byBus,String byBike){
 		
 		int routeOptions = Helper.calculateNonEmptyArgs(byCar,byBus,byBike);
@@ -126,7 +119,7 @@ public class Scenario1 extends BaseOperations{
 	
 	}
 
-	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
+	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "TravelTimeByCar",enabled = false)
 	public void verifyTravelTimebyCar_calculated(String from, String to, String travelTime){
 		
 		By xpathBtn = By.xpath("/html/body/div[1]/div[6]/div/div/div[2]/div/button[1]");
@@ -142,10 +135,24 @@ public class Scenario1 extends BaseOperations{
 
 		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
 		
+//		String result ="";
+//		for(WebElement e:elems){
+//			
+//			String str = e.getText();
+//			result = result+str;
+//		}
+//		
+//		for (int i =0; i<travelTimeArray.length;i++){
+//			if (result.contains(travelTimeArray[i])){
+//				isMatch=true;
+//				break;
+//			}
+//		}
+		
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
 	
-	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
+	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "TravelTimeByBus",enabled = false)
 	public void verifyTravelTimebyBus_calculated(String from, String to, String travelTime){
 
 		String[] travelTimeArray = travelTime.split(",");
@@ -161,10 +168,25 @@ public class Scenario1 extends BaseOperations{
 		
 		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
 		
+//		String result ="";
+//		for(WebElement e:elems){
+//			
+//			String str = e.getText();
+//			result = result+str;
+//		}
+//		
+//		for (int i =0; i<travelTimeArray.length;i++){
+//			if (result.contains(travelTimeArray[i])){
+//				isMatch=true;
+//				break;
+//			}
+//		}
+		
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
+
 	}
 	
-	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
+	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "TravelTimeByBike",enabled = false)
 	public void verifyTravelTimebyBike_calculated(String from, String to, String travelTime ){
 
 		String[] travelTimeArray = travelTime.split(",");
@@ -179,10 +201,24 @@ public class Scenario1 extends BaseOperations{
 		
 		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
 		
+//		String result ="";
+//		for(WebElement e:elems){
+//			
+//			String str = e.getText();
+//			result = result+str;
+//		}
+//		
+//		for (int i =0; i<travelTimeArray.length;i++){
+//			if (result.contains(travelTimeArray[i])){
+//				isMatch=true;
+//				break;
+//			}
+//		}
+		
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
 	
-	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
+	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "TravelTimeOnFoot",enabled = false)
 	public void verifyTravelTimeonFoot_calculated(String from, String to, String travelTime ){
 		
 		By xpathBtn = By.xpath("/html/body/div[1]/div[6]/div/div/div[2]/div/button[5]");
@@ -199,59 +235,35 @@ public class Scenario1 extends BaseOperations{
 		List<WebElement> elems = driver.findElements(xpathTravelTime);
 		
 		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
-
+		
+//		//getting all text data from xpathTravelTime element
+//		String result ="";
+//		for(WebElement e:elems){
+//			
+//			String str = e.getText();
+//			result = result+str;
+//		}
+//		//Asserting data from xpathTravelTime with pattern defined in data provider.
+//		for (int i =0; i<travelTimeArray.length;i++){
+//			if (result.contains(travelTimeArray[i])){
+//				isMatch=true;
+//				break;
+//			}
+//		}
+		
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
 	
-	
 	@DataProvider(name="Directions")
-    public Object[][] getDirectionData(Method e){
-		
-		String methodName = e.getName();
-		
-		switch(methodName){
-		case "setFrom":
-		        return new Object[][] {
-		        	//Location,		DetailedName 
-		        	{ "Tallinn",	"Harju Maakond"}
-		        };
-		case "setTo":
-		        return new Object[][] {
-		        	{ "Narva",		"Ida-Viru Maakond"}
-			        };
-		 default: return null;
-		}
-	}
-	
-	//Script can calculate different travel times for the same route.
-	@DataProvider(name="getTravelTime")
-    public Object[][] getTravelTime(Method e){
-		
-		String methodName = e.getName();
-		
-		switch(methodName){
-		case "verifyTravelTimebyCar_calculated":
-	        return new Object[][] {
-	        	//From,			To 			Travel time options
-	        	{ "Tallinn",	"Narva",	"1 h,2 h,3 h"		}
-	        };
-		case "verifyTravelTimebyBus_calculated":
-		        return new Object[][] {
-	        	{"Tallinn",		"Narva",	"2 h,3 h,4 h"		}
-	        };
-		case "verifyTravelTimebyBike_calculated":
-	        return new Object[][] {
-	        	{"Tallinn",		"Narva",	"15 h,16 h,17 h"	}
-	        };	        
-		case "verifyTravelTimeonFoot_calculated":
-	        return new Object[][] {
-	        	{"Tallinn",		"Narva",	"1 d,2 d"			}
-	        };	        
-		default: return null;
-		}
+    public Object[][] getDirectionData(){
 
+        return new Object[][] {
+    		//From, 		To, 	xpathFrom,		xpathTo 
+            { "Tallinn",	"Narva",
+            						"//*[@id='itinerary_item_0']/div[2]/div[1]/span[1]/div",
+            										"//*[@id='itinerary_item_1']/div[2]/div[2]/span[1]/span/span"}
+        };
 	}
-	
  	@DataProvider(name="TravelTimeOptions")
     public Object[][] getTravelTimeOptions(){
 
@@ -260,12 +272,38 @@ public class Scenario1 extends BaseOperations{
             { "Tallinn",	"Narva","+",	"+",	"+"	}
         };
 	}
-	
-	
-	@AfterClass
-	public void onFinish(){
-		
-		TraceOps.printMessage(LogLevel.TRACE, "Starting AfterClass method...");
-		//super.onFinish();
+	@DataProvider(name="TravelTimeByCar")
+    public Object[][] getTravelTime_ByCar(){
+
+        return new Object[][] {
+    		//From, 		To,		Travel time in hours
+            {"Tallinn",		"Narva","1 h,2 h,3 h"}
+        };
 	}
+	@DataProvider(name="TravelTimeByBus")
+    public Object[][] getTravelTime_ByBus(){
+
+        return new Object[][] {
+    		//From, 		To,		Travel time in hours
+            {"Tallinn",		"Narva","2 h,3 h,4 h"}
+        };
+	}
+	@DataProvider(name="TravelTimeByBike")
+    public Object[][] getTravelTime_ByBike(){
+
+        return new Object[][] {
+    		//From, 		To,		Travel time in hours
+            {"Tallinn",		"Narva","15 h,16 h,17 h"}
+        };
+	}
+	@DataProvider(name="TravelTimeOnFoot")
+    public Object[][] getTravelTime_onFoot(){
+
+        return new Object[][] {
+    		//From, 		To,		Travel time in hours
+            {"Tallinn",		"Narva","1 d,2 d"}
+        };
+	}
+	
+	
 }
