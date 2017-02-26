@@ -5,11 +5,14 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -24,15 +27,19 @@ import some.domain.utils.TraceOps.LogLevel;
 
 public class Scenario1 extends BaseOperations{
 
-	String testName;
-	WebDriverWait wait;
 	
 	public Scenario1() throws IOException {
 		super();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, 10);
 	}
-
+	
+	@BeforeClass
+	public void beforeClass(){
+		
+		driver.manage().window().setPosition(new Point(10, 10));
+	}
+	
     @BeforeMethod
     public void BeforeMethod(Method method)
     {
@@ -51,6 +58,7 @@ public class Scenario1 extends BaseOperations{
 	public void openHomePage(String url) throws InterruptedException{
 
 		driver.get(url);
+
 	}
 
 	@Test(dependsOnMethods = {"openHomePage"}, enabled = true)
@@ -59,7 +67,6 @@ public class Scenario1 extends BaseOperations{
 		By xpathDirectionBtn = By.xpath("//*[@id='searchbar']/div/div/a") ;
 		
 		driver.findElement(xpathDirectionBtn).click();
-		
 	}
 	
 	@Test (dependsOnMethods = {"navigateToDirections"},dataProvider="Directions", enabled = true)
@@ -82,7 +89,6 @@ public class Scenario1 extends BaseOperations{
 		} catch (Exception e) {
 			TraceOps.printMessage(LogLevel.ERROR, "Provided pattern %s was not found in dropdown.", location);
 		}
-
 	}
 	
 	@Test (dependsOnMethods = {"setFrom"},dataProvider = "Directions", enabled = true)
@@ -99,7 +105,6 @@ public class Scenario1 extends BaseOperations{
 
 		//wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
 		wait.until(ExpectedConditions.presenceOfElementLocated(cssSelectSuggestion));
-
 		
 		try {
 			WebElement elem = getElementFromListByText(cssSelectSuggestion, detailedName);
@@ -123,7 +128,6 @@ public class Scenario1 extends BaseOperations{
 		List <WebElement> elems = driver.findElements(By.xpath(xpathTravelOption));
 		
 		Assert.assertEquals(routeOptions, elems.size());
-	
 	}
 
 	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
@@ -131,7 +135,6 @@ public class Scenario1 extends BaseOperations{
 		
 		By xpathBtn = By.xpath("/html/body/div[1]/div[6]/div/div/div[2]/div/button[1]");
 		By xpathTravelTime = By.xpath("//*[@id='routes_list']/ul/li[1]/div/div[2]/div[1]/span");
-		String[] travelTimeArray = travelTime.split(",");
 		boolean isMatch = false;
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Verifying car travel time for the route %s - %s.", from,to);
@@ -140,7 +143,7 @@ public class Scenario1 extends BaseOperations{
 		
 		List<WebElement> elems = driver.findElements(xpathTravelTime);
 
-		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
+		isMatch = Helper.isMatchingElement(elems, travelTime);
 		
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
@@ -148,7 +151,6 @@ public class Scenario1 extends BaseOperations{
 	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
 	public void verifyTravelTimebyBus_calculated(String from, String to, String travelTime){
 
-		String[] travelTimeArray = travelTime.split(",");
 		By xpathBtn =By.xpath("/html/body/div[1]/div[6]/div/div/div[2]/div/button[1]");
 		By xpathTravelTime = By.xpath("//*[@id='routes_list']/ul/li[2]/div/div[2]/div[1]/span");
 		boolean isMatch = false;
@@ -159,7 +161,7 @@ public class Scenario1 extends BaseOperations{
 		
 		List<WebElement> elems = driver.findElements(xpathTravelTime);
 		
-		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
+		isMatch = Helper.isMatchingElement(elems, travelTime);
 		
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
@@ -167,7 +169,6 @@ public class Scenario1 extends BaseOperations{
 	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
 	public void verifyTravelTimebyBike_calculated(String from, String to, String travelTime ){
 
-		String[] travelTimeArray = travelTime.split(",");
 		By xpathBtn = By.xpath("/html/body/div[1]/div[6]/div/div/div[2]/div/button[1]");
 		By xpathTravelTime = By.xpath("//*[@id='routes_list']/ul/li[3]/div/div[2]/div[1]/span");
 		boolean isMatch = false;
@@ -177,7 +178,7 @@ public class Scenario1 extends BaseOperations{
 		driver.findElement(xpathBtn).click();
 		List<WebElement> elems = driver.findElements(xpathTravelTime);
 		
-		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
+		isMatch = Helper.isMatchingElement(elems, travelTime);
 		
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
@@ -185,20 +186,18 @@ public class Scenario1 extends BaseOperations{
 	@Test (dependsOnMethods = {"verifyTravelTimeVisible"},dataProvider = "getTravelTime",enabled = true)
 	public void verifyTravelTimeonFoot_calculated(String from, String to, String travelTime ){
 		
-		By xpathBtn = By.xpath("/html/body/div[1]/div[6]/div/div/div[2]/div/button[5]");
+		By cssWalkBtn= By.cssSelector("button[title='Walk']");
 		By xpathTravelTime = By.xpath("//*[@id='routes_list']/ul/li[1]/div/div[2]/div[1]");
 		boolean isMatch = false;
-		String[] travelTimeArray = travelTime.split(",");
-		
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Verifying on foot travel time for the route %s - %s.", from,to);
 		
-		driver.findElement(xpathBtn).click();
+		driver.findElement(cssWalkBtn).click();
 		
 		waitForElement(xpathTravelTime, 10, 1, false);
 		List<WebElement> elems = driver.findElements(xpathTravelTime);
 		
-		isMatch = Helper.isMatchingElement(elems, travelTimeArray);
+		isMatch = Helper.isMatchingElement(elems, travelTime);
 
 		Assert.assertTrue(isMatch,"Calculated travel time does not match expected values.");
 	}
@@ -260,12 +259,11 @@ public class Scenario1 extends BaseOperations{
             { "Tallinn",	"Narva","+",	"+",	"+"	}
         };
 	}
-	
-	
+
 	@AfterClass
-	public void onFinish(){
+	public void onFinish1(){
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Starting AfterClass method...");
-		//super.onFinish();
+		super.onFinish();
 	}
 }

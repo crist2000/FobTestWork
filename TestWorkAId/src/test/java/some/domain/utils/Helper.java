@@ -46,10 +46,13 @@ public class Helper {
 	/**
 	 * Defines if there is element which matches provided criteria. Search performed on linked text.
 	 * @param elems - list to be assessed.
-	 * @param criterias - pattern to be seeking for.
+	 * @param criterias - pattern to be seeking for. Use comma separated strings if multiple 
+	 * different values are expected to searched for, like this: "str1, str2, str3"
 	 * @return TRUE if match is found in the list.
 	 */
-	public static boolean isMatchingElement(List<WebElement> elems, String[] criterias){
+	public static boolean isMatchingElement(List<WebElement> elems, String criterias){
+		
+		String[] strArray = criterias.split(",");
 		
 		boolean isMatch = false;
 		
@@ -61,9 +64,9 @@ public class Helper {
 			result = result+str;
 		}
 		//Asserting data from List of web elements with pattern defined in criterias.
-		for (int i =0; i<criterias.length;i++){
-			if (result.contains(criterias[i])){
-				TraceOps.printMessage(LogLevel.TRACE, "  Matching element was found: %s", criterias[i]);
+		for (int i =0; i<strArray.length;i++){
+			if (result.contains(strArray[i])){
+				TraceOps.printMessage(LogLevel.TRACE, "  Matching element was found: %s", strArray[i]);
 				isMatch=true;
 				break;
 			}

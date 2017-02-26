@@ -1,10 +1,6 @@
 package some.domain.common;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -12,11 +8,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 
 import com.google.common.base.Function;
@@ -26,35 +24,23 @@ import some.domain.utils.TraceOps.LogLevel;
 
 /**
  * Base class for all tests. Initializes webDiver object and contains fields and methods which
- * operate with webDiver object.
+ * operate with webDiver object. Make sure that path to chrome browser  driver is added to 
+ * system PATH variable.
  */
 public class BaseOperations{
-	private final static String webdriverFolderPath = "C:\\Tools\\WebDrivers\\";
-	private final static String DRV_FileNamechrome = "chromedriver.exe";
-	private final static String DRV_FileName_Firefox = "geckodriver.exe";
-	private final static String DRV_FileName_IE = "MicrosoftWebDriver.exe";
+
 	public WebDriver driver;
+	protected String testName;
+	public WebDriverWait wait;
 
 	
 	public BaseOperations () throws IOException {
 		
-		Init();
+		//Make sure that path to chrome browser is added to system PATH variable.
 		driver = new ChromeDriver();
+		driver.manage().window().setPosition(new Point(-2000, 0));
 	}
 
- 	private static void Init() throws IOException {
- 
-		Path pathChrome = Paths.get(webdriverFolderPath, DRV_FileNamechrome);
-		Path pathFirefox = Paths.get(webdriverFolderPath, DRV_FileName_Firefox);
-		Path pathIE = Paths.get(webdriverFolderPath,DRV_FileName_IE);
-		File chromeDrvFile = new File(pathChrome.toString());
-		File firefoxDrvFile = new File(pathFirefox.toString());
-		File IEDrvFile = new File(pathIE.toString());	
-		 
-		System.setProperty("webdriver.chrome.driver",chromeDrvFile.getCanonicalPath());
-		System.setProperty("webdriver.gecko.driver", firefoxDrvFile.getCanonicalPath());
-		System.setProperty("webdriver.ie.driver", IEDrvFile.getCanonicalPath());
-	}
  	protected void closeAllWindows () throws Exception{
  		
  		TraceOps.printMessage(TraceOps.LogLevel.TRACE, "Closing all windows...", "");
@@ -75,7 +61,6 @@ public class BaseOperations{
  	 * @return - TRUE if element was found. 
  	 */
  	protected boolean assertElementIsPresent(By by) {
-		
 
 		try {
 			TraceOps.printMessage(LogLevel.TRACE, "  Verfying selected element...", "");
@@ -172,7 +157,6 @@ public class BaseOperations{
 		TraceOps.printMessage(LogLevel.ERROR, message);
 		
 		Assert.assertTrue(false);
-		driver.close();
 	}
 
 	/**
@@ -224,6 +208,7 @@ public class BaseOperations{
 
 		try {
 			TraceOps.printMessage(LogLevel.INFO, "%s execution has been completed. Closing browser window.", (this.getClass().getSimpleName()));
+			Thread.sleep(2000);
 			driver.close();
 		} catch (Exception e) {
 			e.printStackTrace();

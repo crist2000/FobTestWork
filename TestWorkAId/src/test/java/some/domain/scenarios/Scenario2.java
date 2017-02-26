@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
+import org.testng.annotations.BeforeClass;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -24,13 +26,18 @@ import some.domain.utils.TraceOps.LogLevel;
 
 public class Scenario2 extends BaseOperations {
 
-	public WebDriverWait wait;
-	String testName;
+	//this field is required to identify that Collection's list is empty or not.
+	By cssCollectionList = By.cssSelector("h4[class='title']");
 	
 	public Scenario2() throws IOException {
 		super();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, 10);
+	}
+	
+	@BeforeClass
+	public void beforeClass(){
+		driver.manage().window().setPosition(new Point(10, 10));
 	}
 	
     @BeforeMethod
@@ -90,6 +97,9 @@ public class Scenario2 extends BaseOperations {
 	@Test (dependsOnMethods = { "signIn" },dataProvider = "Location",enabled = true)
 	public void selectLocation (String Location){
 		
+		if (assertElementIsPresent(cssCollectionList))
+			failOperation("Test operation is aborted. Make sure that Collection's list is empty.");
+		
 		By cssCollectionInput = By.cssSelector("#searchbar > div > div.bar.bar_no_bottom > input");
 		By cssSelectLocationFromDropdown = By.cssSelector("div[class='dropdown_list_item suggestion']");
 		String xpathSuggestion = "//*[@id='searchbar']/div/div[2]/div";
@@ -129,10 +139,14 @@ public class Scenario2 extends BaseOperations {
 		String xpathCreateBtn = "/html/body/div[1]/div[7]/div/div/div/div[2]/form/fieldset[2]/button[2]";
 		By idCollectionInput = By.id("collection_name");
 		
-		waitForElement(cssStartCollectionBtn, 10, 1, true);
-		wait.until(ExpectedConditions.elementToBeClickable(cssStartCollectionBtn));
+		//body > div.main_container > div.modal_container > div > div > div > div.collections_empty > button
+		TraceOps.printMessage(LogLevel.DEBUG,"before cssStartCollectionBtn");
+		//waitForElement(cssStartCollectionBtn, 10, 1, true);
+		//wait.until(ExpectedConditions.elementToBeClickable(cssStartCollectionBtn));
+		wait.until(ExpectedConditions.presenceOfElementLocated(cssStartCollectionBtn));
 		
 		driver.findElement(cssStartCollectionBtn).click();
+		TraceOps.printMessage(LogLevel.DEBUG,"after cssStartCollectionBtn");
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Entering collection name...");
 
@@ -140,21 +154,24 @@ public class Scenario2 extends BaseOperations {
 		driver.findElement(idCollectionInput).sendKeys(collectionName);
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Generating new collection...");
-		
+		TraceOps.printMessage(LogLevel.DEBUG,"before xpathCreateBtn");
 		waitForElement(By.xpath(xpathCreateBtn), 5, 1, false);
 		driver.findElement(By.xpath(xpathCreateBtn)).click();
+		TraceOps.printMessage(LogLevel.DEBUG,"after  xpathCreateBtn");
 		
 		TraceOps.printMessage(LogLevel.TRACE,"New collection has been created. Finishing ...");
 
+		TraceOps.printMessage(LogLevel.DEBUG,"before  cssDoneBtn");
+		//waitForElement(cssDoneBtn, 10, 1, false);
+		wait.until(ExpectedConditions.elementToBeClickable(cssDoneBtn));
 		driver.findElement(cssDoneBtn).click();
-		
+		TraceOps.printMessage(LogLevel.DEBUG,"after  cssDoneBtn");
 	}
 
 	@Test (dependsOnMethods = { "createNewCollection" },dataProvider = "Location",enabled = true)
 	public void verifyCollectionExists(String location){
 		
 		SoftAssert softAssert = new SoftAssert();
-		By cssCollectionList = By.cssSelector("h4[class='title']");
 		
 		TraceOps.printMessage(LogLevel.INFO,"Verifying collection is present...");
 		
@@ -177,12 +194,13 @@ public class Scenario2 extends BaseOperations {
 		}
 	}
 	
-
-	@DataProvider(name="Location")
-    public Object[][] getLo(){
+	
+ 	@DataProvider(name="Location")
+    public Object[][] getTravelTimeOptions(){
 
         return new Object[][] {
-            {"Tallinn"}
+    		//From, 
+            { "Tallinn"	}
         };
 	}
 	
@@ -204,7 +222,7 @@ public class Scenario2 extends BaseOperations {
 		driver.findElement(cssConfirmDelete).click();
 
 		TraceOps.printMessage(LogLevel.TRACE,"Test data clearing completed.");
-		//super.onFinish();
+		super.onFinish();
 	}
 }
 	

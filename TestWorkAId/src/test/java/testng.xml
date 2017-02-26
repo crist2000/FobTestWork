@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="example suite" verbose="1" >
+  
+  <parameter name="wego_home" value="https://wego.here.com" />
+  <parameter name="gsmarena_home" value="http://www.gsmarena.com" />
+  <parameter name="wego_uid" value="" />
+  <parameter name="wego_pwd" value="" />
+  
+  
+  <test name="Test suite 1" >
+    <classes>
+      <class name="some.domain.scenarios.Scenario1"/>
+      <class name="some.domain.scenarios.Scenario2"/>
+      <class name="some.domain.scenarios.Scenario3"/>
+    </classes>
+ </test>
+</suite>

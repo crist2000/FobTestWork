@@ -1,0 +1,27 @@
+TASK FOR TEST AUTOMATION
+ENGINEER
+Goal:
+Create automated tests for all the scenarios with Selenium WebDriver.
+
+Tasks:
+Create git repository for your automated tests
+Create and document 3 test scenarios based on the descriptions below
+Automate your scenarios
+Create a clear step-by-step guide how to get tests running
+Share the repositories and the guide with us: employme@fob-solutions.com
+Technical requirements:
+The test should be able to run on Chrome browser.
+
+Scenario descriptions:
+Scenario 1: Open wego.here.com and create a route between 2 locations and verify that different route options
+(Drive route, Public transport route, Bike route etc.) are calculated.
+
+Scenario 2: Open wego.here.com and sign in. Search a location and collect it (with the “star” on the UI). Verify
+from the “Collections” (option from the side menu) that collected place exists and that it is the place that was
+collected.
+(Collecting is a typical favourites feature)
+
+Scenario 3: Open www.gsmarena.com and search for a mobile device. Based on specifications, verify that the
+device supports GPS.
+Automate these scenarios to the best of your ability.
+Everything else is up to you.

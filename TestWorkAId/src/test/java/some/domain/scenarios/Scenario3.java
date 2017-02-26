@@ -1,14 +1,22 @@
 package some.domain.scenarios;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.hamcrest.core.IsSame;
+import org.testng.annotations.BeforeClass;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -20,21 +28,41 @@ import some.domain.utils.TraceOps.LogLevel;
 
 public class Scenario3 extends BaseOperations{
 
+
 	public Scenario3() throws IOException {
 		super();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		wait = new WebDriverWait(driver, 10);
 	}
 
+	@BeforeClass
+	public void beforeClass(){
+		driver.manage().window().setPosition(new Point(10, 10));
+	}
+	
+    @BeforeMethod
+    public void BeforeMethod(Method method)
+    {
+        testName = method.getName(); 
+        TraceOps.printMessage(LogLevel.INFO, "Executing test: %s...", testName);
+    }
+    @AfterMethod
+    public void AfterMethod()
+    {
+        TraceOps.printMessage(LogLevel.INFO, "Finished test execution: %s", testName);
+    }
+	
+	
+	
 	@Test(priority =0) 
 	@Parameters({"gsmarena_home"})
 	public void openHomePage(String url) throws InterruptedException{
-		
-		TraceOps.printMessage(LogLevel.TRACE, "Openening home page %s...", url);
+
 		driver.get(url);
-		TraceOps.printMessage(LogLevel.TRACE, "Home page has been opened.");
+
 	}
 
-	@Test (priority =5)
+	@Test (dependsOnMethods = {"openHomePage"}, enabled = true)
 	public void selectRandomManufacturer(){
 		
 		String xpathManufacturers;
@@ -60,64 +88,70 @@ public class Scenario3 extends BaseOperations{
 		TraceOps.printMessage(LogLevel.TRACE, "Manufacturer page has been opened.");
 	}
 	
-	@Test (priority =7)
+	@Test (dependsOnMethods = {"selectRandomManufacturer"}, enabled = true)
 	public void selectRandomPhone (){
 		
 		String modelName;
-		String xpathPhones;
 		String xpathPhone;
 		int elemIndex;
 		
-		xpathPhones = "//*[@id='review-body']/div/ul/li";
+		String xpathPhones = "//*[@id='review-body']/div/ul/li";
+		By xpathPhoneStats = By.xpath("//*[@id='body']/div/div[1]/div/div[1]/h1");
 		
 		List<WebElement> phones = driver.findElements(By.xpath(xpathPhones));
 		elemIndex = Helper.getRandomIndex(phones);
-		xpathPhone = xpathPhones + "[" + elemIndex + "]";
+		xpathPhone = xpathPhones + "[" + elemIndex + "]"+"/a";
 		modelName = driver.findElement(By.xpath(xpathPhone)).getText();
 		
 		TraceOps.printMessage(LogLevel.INFO, "%s phone model has been randomly selected", modelName);
 
-		waitForElement(By.linkText(modelName), 10, 1, false);
+		//sometimes popup screen overlaps with selected phone and receives the click.
+		//the code below just removes this popup.
+		try {
+			By cssLocker = By.cssSelector("div.cc_banner-wrapper > div > a.cc_btn.cc_btn_accept_all");
+			driver.findElement(cssLocker).click();
+		} catch (Exception e) {
+			TraceOps.printMessage(LogLevel.ERROR, "Failed to remove popup element.");
+		}
 		
-		driver.findElement(By.xpath(xpathPhone+"/a")).click();
+		wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpathPhone)));
+		
+		driver.findElement(By.xpath(xpathPhone)).click();
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Verifying that correct phone model page has been opened...");
-		String xpathPhoneStats = "//*[@id='body']/div/div[1]/div/div[1]/h1";
-		waitForElement(By.xpath(xpathPhoneStats), 10, 1, false);
 		
-		Assert.assertTrue(driver.findElement(By.xpath(xpathPhoneStats)).getText().contains(modelName),
+		waitForElement(xpathPhoneStats, 10, 1, false);
+		
+		Assert.assertTrue(driver.findElement(xpathPhoneStats).getText().contains(modelName),
 											"Incorrect model page has been opened." );
 
 	}
 
-	@Test (priority =10)
+	@Test (dependsOnMethods = {"selectRandomPhone"}, enabled = true)
 	public void verifyIsGPS(){
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Verifying if selected model is designed to use GPS...");
-		
-		String xpathSpecTable = "//*[@id='specs-list']/table";
-		waitForElement(By.xpath(xpathSpecTable), 10, 1, false);
-		
-		List <WebElement> elems = driver.findElements(By.xpath(xpathSpecTable));
-		
 		boolean isMatch = false;
-
-		for(WebElement e:elems){
-			if(e.getText().contains("GPS Yes")){
-				isMatch =true;
-				break;
-			}
-		}
+		By xpathSpecTable = By.xpath("//*[@id='specs-list']/table");
+		String criteria = "GPS Yes";
+		
+		waitForElement(xpathSpecTable, 10, 1, false);
+		
+		List <WebElement> elems = driver.findElements(xpathSpecTable);
+		
+		isMatch = Helper.isMatchingElement(elems, criteria);
 		
 		Assert.assertTrue(isMatch, "Selected phone model is not designed to use GPS.");
 		
 	}
 	
-//	@AfterClass
-//	@Override
-//	public void onFinish() {
-//		super.onFinish();
-//	}
+	@AfterClass
+	@Override
+	public void onFinish() {
+		
+		TraceOps.printMessage(LogLevel.TRACE, "Starting AfterClass method...");
+		super.onFinish();
+	}
 	
 
 }

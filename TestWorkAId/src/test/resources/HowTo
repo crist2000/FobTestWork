@@ -1,0 +1,14 @@
+HowTo Run
+
+a. Install Spring Framework v4 (or Eclipse with TestNG and Maven plugins).
+b. Download selenium-java jar v3.
+c. Install Java JDV v7 or higher.
+d. Define JAVA_HOME per your JDK installation
+e. Download chrome web driver binary and add its path to system PATH variable.
+f. Download test source code from gitHub
+g. Start Spring suite with new Workspce.
+h. Open existing Maven project. Use folder where source code was downloaded to.
+i. locate tesng.xml and fill "wego_uid" and "wego_pwd" parameters with valid Wego credentials.
+	if you want to run specific scenario only comment out undesired test class in testng.xml
+i. right click on testng.xml and select RunAs - TestNG suite.
+
