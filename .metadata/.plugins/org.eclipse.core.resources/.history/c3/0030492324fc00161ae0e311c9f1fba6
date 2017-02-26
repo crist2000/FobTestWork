@@ -12,13 +12,14 @@ e. Download chrome web driver binary and add its path to system PATH variable.
 
 f. Download test source code from gitHub.
 
-g. Start Spring suite with new Workspace.
+g. Start Spring suite with new Workspce.
 
 h. Open existing Maven project. Use folder where source code was downloaded to.
+
 	If there will be errors then use framework suggestion to fix them.
 	
 i. locate tesng.xml and fill "wego_uid" and "wego_pwd" parameters with valid Wego credentials.
-	if you want to run specific scenario just comment out undesired test classes in testng.xml.
+	if you want to run specific scenario only comment out undesired test class in testng.xml.
 	
 j. right click on testng.xml and select RunAs - TestNG suite.
 

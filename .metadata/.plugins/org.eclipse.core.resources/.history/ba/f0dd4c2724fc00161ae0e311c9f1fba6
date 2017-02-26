@@ -12,7 +12,7 @@ e. Download chrome web driver binary and add its path to system PATH variable.
 
 f. Download test source code from gitHub.
 
-g. Start Spring suite with new Workspace.
+g. Start Spring suite with new Workspce.
 
 h. Open existing Maven project. Use folder where source code was downloaded to.
 	If there will be errors then use framework suggestion to fix them.
