@@ -28,3 +28,9 @@ If you want to run test using Maven build job then the following steps are neede
 k. set  default system java library to 1.8 JDK under window-preferences-java-build path.
 l. Start test by right click on project Run-As Maven Test
 
+Or
+
+	m. Install Maven client.
+	n. open command prompt and navigate to folder with POM.xml file. Run "mvn test".
+
+
