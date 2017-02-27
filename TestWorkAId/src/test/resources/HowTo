@@ -22,3 +22,9 @@ i. locate tesng.xml and fill "wego_uid" and "wego_pwd" parameters with valid Weg
 	
 j. right click on testng.xml and select RunAs - TestNG suite.
 
+
+If you want to run test using Maven build job then the following steps are needed:
+
+k. set  default system java library to 1.8 JDK under window-preferences-java-build path.
+l. Start test by right click on project Run-As Maven Test
+
