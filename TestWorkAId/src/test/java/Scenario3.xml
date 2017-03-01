@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="example suite" verbose="1" >
+  
+  <parameter name="gsmarena_home" value="http://www.gsmarena.com" />
+ 
+  
+  <test name="Test suite 1" >
+    <classes>
+      <class name="some.domain.scenarios.Scenario3"/>
+    </classes>
+ </test>
+</suite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="example suite" verbose="1" >
+  
+  <parameter name="wego_home" value="https://wego.here.com" />
+ 
+  <test name="Test suite 1" >
+    <classes>
+      <class name="some.domain.scenarios.Scenario1"/>
+    </classes>
+ </test>
+</suite>
