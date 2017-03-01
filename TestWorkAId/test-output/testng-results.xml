@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" ignored="0" total="2" passed="2">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Command line suite" duration-ms="69" started-at="2017-03-01T13:36:00Z" finished-at="2017-03-01T13:36:00Z">
+    <groups>
+    </groups>
+    <test name="Command line test" duration-ms="69" started-at="2017-03-01T13:36:00Z" finished-at="2017-03-01T13:36:00Z">
+      <class name="some.domain.Test1">
+        <test-method status="PASS" signature="runTest()[pri:0, instance:some.domain.Test1@43556938]" name="runTest" duration-ms="17" started-at="2017-03-01T15:36:00Z" finished-at="2017-03-01T15:36:00Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- runTest -->
+      </class> <!-- some.domain.Test1 -->
+      <class name="some.domain.child.Test2">
+        <test-method status="PASS" signature="runTest()[pri:0, instance:some.domain.child.Test2@5f205aa]" name="runTest" duration-ms="1" started-at="2017-03-01T15:36:00Z" finished-at="2017-03-01T15:36:00Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- runTest -->
+      </class> <!-- some.domain.child.Test2 -->
+    </test> <!-- Command line test -->
+  </suite> <!-- Command line suite -->
+</testng-results>
