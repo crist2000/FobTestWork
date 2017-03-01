@@ -33,4 +33,5 @@ Or
 	m. Install Maven client.
 	n. open command prompt and navigate to folder with POM.xml file. Run "mvn test".
 
-
+If want to run test scenario from main method (and apparently from java command line) under build 
+path make test class output folder be the same as MainApp class's build output e.g. "target/classes" 
