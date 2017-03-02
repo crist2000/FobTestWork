@@ -3,7 +3,7 @@
   
     
   <listeners>
-    <listener class-name="some.domain.CustomListerner" />
+    <listener class-name="some.domain.common.CustomListerner" />
   </listeners>
   
   <parameter name="wego_home" value="https://wego.here.com" />

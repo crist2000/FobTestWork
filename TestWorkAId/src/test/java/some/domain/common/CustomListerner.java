@@ -1,4 +1,4 @@
-package some.domain;
+package some.domain.common;
 
 
 
