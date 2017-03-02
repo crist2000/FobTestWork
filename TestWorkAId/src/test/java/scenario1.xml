@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suite name="example suite" verbose="1" >
   
+    
+  <listeners>
+    <listener class-name="some.domain.CustomListerner" />
+  </listeners>
+  
   <parameter name="wego_home" value="https://wego.here.com" />
  
   <test name="Test suite 1" >
