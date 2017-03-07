@@ -1,30 +1,25 @@
 package some.domain.scenarios;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
-import org.testng.annotations.BeforeClass;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import some.domain.common.BaseOperations;
+import some.domain.common.TestClassBaseSettings;
 import some.domain.repository.WegoOps;
 import some.domain.utils.Helper;
 import some.domain.utils.TraceOps;
 import some.domain.utils.TraceOps.LogLevel;
 
-public class Scenario2 extends BaseOperations {
+public class Scenario2 extends TestClassBaseSettings {
 
 	//this field is required to identify that Collection's list is empty or not.
 	By cssCollectionList = By.cssSelector("h4[class='title']");
@@ -35,23 +30,7 @@ public class Scenario2 extends BaseOperations {
 		wait = new WebDriverWait(driver, 10);
 	}
 	
-	@BeforeClass
-	public void beforeClass(){
-		driver.manage().window().setPosition(new Point(10, 10));
-	}
-	
-    @BeforeMethod
-    public void BeforeMethod(Method method)
-    {
-        testName = method.getName(); 
-        TraceOps.printMessage(LogLevel.INFO, "Executing test: %s...", testName);
-    }
-    
-    @AfterMethod
-    public void AfterMethod()
-    {
-        TraceOps.printMessage(LogLevel.INFO, "Finished test execution: %s", testName);
-    }
+
 	
 	@Test (priority = 0)
 	@Parameters({"wego_home"})
@@ -139,14 +118,11 @@ public class Scenario2 extends BaseOperations {
 		String xpathCreateBtn = "/html/body/div[1]/div[7]/div/div/div/div[2]/form/fieldset[2]/button[2]";
 		By idCollectionInput = By.id("collection_name");
 		
-		//body > div.main_container > div.modal_container > div > div > div > div.collections_empty > button
-		TraceOps.printMessage(LogLevel.DEBUG,"before cssStartCollectionBtn");
 		//waitForElement(cssStartCollectionBtn, 10, 1, true);
 		//wait.until(ExpectedConditions.elementToBeClickable(cssStartCollectionBtn));
 		wait.until(ExpectedConditions.presenceOfElementLocated(cssStartCollectionBtn));
 		
 		driver.findElement(cssStartCollectionBtn).click();
-		TraceOps.printMessage(LogLevel.DEBUG,"after cssStartCollectionBtn");
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Entering collection name...");
 
@@ -154,18 +130,14 @@ public class Scenario2 extends BaseOperations {
 		driver.findElement(idCollectionInput).sendKeys(collectionName);
 		
 		TraceOps.printMessage(LogLevel.TRACE, "Generating new collection...");
-		TraceOps.printMessage(LogLevel.DEBUG,"before xpathCreateBtn");
 		waitForElement(By.xpath(xpathCreateBtn), 5, 1, false);
 		driver.findElement(By.xpath(xpathCreateBtn)).click();
-		TraceOps.printMessage(LogLevel.DEBUG,"after  xpathCreateBtn");
 		
 		TraceOps.printMessage(LogLevel.TRACE,"New collection has been created. Finishing ...");
 
-		TraceOps.printMessage(LogLevel.DEBUG,"before  cssDoneBtn");
 		//waitForElement(cssDoneBtn, 10, 1, false);
 		wait.until(ExpectedConditions.elementToBeClickable(cssDoneBtn));
 		driver.findElement(cssDoneBtn).click();
-		TraceOps.printMessage(LogLevel.DEBUG,"after  cssDoneBtn");
 	}
 
 	@Test (dependsOnMethods = { "createNewCollection" },dataProvider = "Location",enabled = true)
@@ -196,7 +168,7 @@ public class Scenario2 extends BaseOperations {
 	
 	
  	@DataProvider(name="Location")
-    public Object[][] getTravelTimeOptions(){
+    public Object[][] getLocation(){
 
         return new Object[][] {
     		//From, 
@@ -205,24 +177,27 @@ public class Scenario2 extends BaseOperations {
 	}
 	
 	@AfterClass
-	public void onFinish(){
-		TraceOps.printMessage(LogLevel.TRACE,"Clearing test data...");
+	public void baseAfterClasss(){
 		
 		By cssEditBtn = By.cssSelector("button[title='Edit']");
 		By cssDeleteBtn = By.cssSelector("button[class='btn_delete']");
-		By cssConfirmDelete = By.cssSelector ("div[class ='delete_overlay']> button.btn_link.confirm");// div.delete_overlay > button.btn_link.confirm
+		By cssConfirmDelete = By.cssSelector("div[class ='delete_overlay']> button.btn_link.confirm");// div.delete_overlay > button.btn_link.confirm
 		
-		WegoOps.openMenu(wait, this);
-		WegoOps.selectMenuItem(WegoOps.MENU_COLLECTIONS, this);
+		TraceOps.printMessage(LogLevel.TRACE,"Clearing test data...");
 		
-		driver.findElement(cssEditBtn).click();
-		driver.findElement(cssDeleteBtn).click();
-
-		waitForElement(cssConfirmDelete, 15, 1, true);
-		driver.findElement(cssConfirmDelete).click();
-
+		try {
+			WegoOps.openMenu(wait, this);
+			WegoOps.selectMenuItem(WegoOps.MENU_COLLECTIONS, this);
+			driver.findElement(cssEditBtn).click();
+			driver.findElement(cssDeleteBtn).click();
+			waitForElement(cssConfirmDelete, 15, 1, true);
+			driver.findElement(cssConfirmDelete).click();
+		} catch (Exception e) {
+			TraceOps.printMessage(LogLevel.ERROR, "Data clearing has failed. Check the exception: %s", e);
+		}
+		
 		TraceOps.printMessage(LogLevel.TRACE,"Test data clearing completed.");
-		super.onFinish();
+		super.baseAfterClasss();
 	}
 }
 	

@@ -5,53 +5,28 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import some.domain.common.BaseOperations;
+import some.domain.common.TestClassBaseSettings;
 import some.domain.utils.Helper;
 import some.domain.utils.TraceOps;
 import some.domain.utils.TraceOps.LogLevel;
 
-public class Scenario1 extends BaseOperations{
+public class Scenario1 extends TestClassBaseSettings{
 
 	
 	public Scenario1() throws IOException {
 		super();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, 10);
 	}
-	
-	@BeforeClass
-	public void beforeClass(){
-		
-		driver.manage().window().setPosition(new Point(10, 10));
-	}
-	
-    @BeforeMethod
-    public void BeforeMethod(Method method)
-    {
-        testName = method.getName(); 
-        TraceOps.printMessage(LogLevel.INFO, "Executing test: %s...", testName);
-    }
-    @AfterMethod
-    public void AfterMethod()
-    {
-        TraceOps.printMessage(LogLevel.INFO, "Finished test execution: %s", testName);
-    }
-	
 	
 	@Test(priority =0) 
 	@Parameters({"wego_home"})
@@ -103,10 +78,12 @@ public class Scenario1 extends BaseOperations{
 		element.clear();
 		element.sendKeys(location);
 
+		
 		//wait.until(ExpectedConditions.elementToBeClickable(cssSelectSuggestion));
 		wait.until(ExpectedConditions.presenceOfElementLocated(cssSelectSuggestion));
 		
 		try {
+			Thread.sleep(1000);
 			WebElement elem = getElementFromListByText(cssSelectSuggestion, detailedName);
 			elem.click();
 		} catch (Exception e) {
@@ -260,10 +237,4 @@ public class Scenario1 extends BaseOperations{
         };
 	}
 
-	@AfterClass
-	public void onFinish1(){
-		
-		TraceOps.printMessage(LogLevel.TRACE, "Starting AfterClass method...");
-		super.onFinish();
-	}
 }

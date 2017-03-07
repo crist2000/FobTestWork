@@ -1,32 +1,23 @@
 package some.domain.scenarios;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.hamcrest.core.IsSame;
-import org.testng.annotations.BeforeClass;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
-import some.domain.common.BaseOperations;
+import some.domain.common.TestClassBaseSettings;
 import some.domain.utils.Helper;
 import some.domain.utils.TraceOps;
 import some.domain.utils.TraceOps.LogLevel;
 
-public class Scenario3 extends BaseOperations{
+public class Scenario3 extends TestClassBaseSettings{
 
 
 	public Scenario3() throws IOException {
@@ -35,24 +26,6 @@ public class Scenario3 extends BaseOperations{
 		wait = new WebDriverWait(driver, 10);
 	}
 
-	@BeforeClass
-	public void beforeClass(){
-		driver.manage().window().setPosition(new Point(10, 10));
-	}
-	
-    @BeforeMethod
-    public void BeforeMethod(Method method)
-    {
-        testName = method.getName(); 
-        TraceOps.printMessage(LogLevel.INFO, "Executing test: %s...", testName);
-    }
-    @AfterMethod
-    public void AfterMethod()
-    {
-        TraceOps.printMessage(LogLevel.INFO, "Finished test execution: %s", testName);
-    }
-	
-	
 	
 	@Test(priority =0) 
 	@Parameters({"gsmarena_home"})
@@ -145,13 +118,13 @@ public class Scenario3 extends BaseOperations{
 		
 	}
 	
-	@AfterClass
-	@Override
-	public void onFinish() {
-		
-		TraceOps.printMessage(LogLevel.TRACE, "Starting AfterClass method...");
-		super.onFinish();
-	}
+//	@AfterClass
+//	@Override
+//	public void baseAfterClasss() {
+//		
+//		
+//		super.baseAfterClasss();
+//	}
 	
 
 }

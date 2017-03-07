@@ -16,6 +16,7 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 
 import com.google.common.base.Function;
 
@@ -149,7 +150,7 @@ public class BaseOperations{
 	}
 	
 	/**
-	 * Reserved for future use.
+	 * Urgent currently running test fail. Reserved for future use.
 	 * @param message
 	 */
 	protected void failOperation (String message){
@@ -177,7 +178,7 @@ public class BaseOperations{
 	 * Method to get element from the list that matches specific criteria.
 	 * @param by - locator
 	 * @param criteria - pattern to be searched for.
-	 * @return - matching web element. NULL is no match was found. 
+	 * @return - matching web element. NULL if no match was found. 
 	 */
 	protected WebElement getElementFromListByText(By by, String criteria){
 		
@@ -204,7 +205,7 @@ public class BaseOperations{
 	/**
 	 * Base method to be used in child class's @AfterClass methods
 	 */
-	protected void onFinish(){
+	protected void closeCurrentWindow(){
 
 		try {
 			TraceOps.printMessage(LogLevel.INFO, "%s execution has been completed. Closing browser window.", (this.getClass().getSimpleName()));
@@ -214,5 +215,5 @@ public class BaseOperations{
 			e.printStackTrace();
 		}
 	}
-
+	
 }
