@@ -26,9 +26,19 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <version>2.14.1</version>
             <configuration>
+				<properties>
+				   	<property>
+					     <name>parallel</name>
+					     <value>classes</value>
+				   	</property>
+			   		<property>
+					     <name>threadCount</name>
+					     <value>3</value>
+				   	</property>
+				</properties>
                 <!-- Suite testng xml file to consider for test execution -->
                 <suiteXmlFiles>
-                    <suiteXmlFile>src/test/java/scenario1.xml</suiteXmlFile>
+                    <suiteXmlFile>src/test/java/testng.xml</suiteXmlFile>
                 </suiteXmlFiles>
             </configuration>
         </plugin>
